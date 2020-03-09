@@ -1,8 +1,9 @@
+/* eslint-disable no-param-reassign */
+
 const express = require('express');
 
-const bookRouter = express.Router();
-
 const routes = Book => {
+	const bookRouter = express.Router();
 	bookRouter
 		.route('/books')
 		.post((req, res) => {
@@ -24,14 +25,30 @@ const routes = Book => {
 				return res.send(books);
 			});
 		});
-	bookRouter.route('/books/:bookId').get((req, res) => {
-		Book.findById(req.params.bookId, (err, books) => {
-			if (err) {
-				return res.send(err);
-			}
-			return res.send(books);
+	bookRouter
+		.route('/books/:bookId')
+		.get((req, res) => {
+			Book.findById(req.params.bookId, (err, book) => {
+				if (err) {
+					return res.send(err);
+				}
+				return res.send(book);
+			});
+		})
+		.put((req, res) => {
+			Book.findById(req.params.bookId, (err, book) => {
+				if (err) {
+					return res.send(err);
+				}
+				book.title = req.body.title;
+				book.authoe = req.body.author;
+				book.genre = req.body.genre;
+				book.read = req.body.read;
+				book.save();
+				return res.send(book);
+			});
 		});
-	});
+	return bookRouter;
 };
 
 module.exports = routes;
