@@ -25,7 +25,7 @@ const routes = Book => {
 				return res.send(books);
 			});
 		});
-	bookRouter.use('/books/:bookid', (req, res, next) => {
+	bookRouter.use('/books/:bookId', (req, res, next) => {
 		Book.findById(req.params.bookId, (err, book) => {
 			if (err) {
 				return res.send(err);
@@ -47,7 +47,32 @@ const routes = Book => {
 			book.genre = req.body.genre;
 			book.read = req.body.read;
 			book.save();
-			return res.send(book);
+			req.book.save(err => {
+				if (err) {
+					return res.send(err);
+				}
+				return res.json(book);
+			});
+		})
+		.patch((req, res) => {
+			const { book } = req;
+
+			// eslint-disable-next-line no-underscore-dangle
+			if (req.body._id) {
+				// eslint-disable-next-line no-underscore-dangle
+				delete req.body._id;
+			}
+			Object.entries(req.body).forEach(item => {
+				const key = item[0];
+				const value = item[1];
+				book[key] = value;
+			});
+			req.book.save(err => {
+				if (err) {
+					return res.send(err);
+				}
+				return res.json(book);
+			});
 		});
 	return bookRouter;
 };
