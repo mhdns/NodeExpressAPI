@@ -25,6 +25,7 @@ const routes = Book => {
 				return res.send(books);
 			});
 		});
+
 	bookRouter.use('/books/:bookId', (req, res, next) => {
 		Book.findById(req.params.bookId, (err, book) => {
 			if (err) {
@@ -37,6 +38,7 @@ const routes = Book => {
 			return res.sendStatus(404);
 		});
 	});
+
 	bookRouter
 		.route('/books/:bookId')
 		.get((req, res) => res.json(req.book))
@@ -72,6 +74,14 @@ const routes = Book => {
 					return res.send(err);
 				}
 				return res.json(book);
+			});
+		})
+		.delete((req, res) => {
+			req.book.remove(err => {
+				if (err) {
+					return res.send(err);
+				}
+				return res.sendStatus(204);
 			});
 		});
 	return bookRouter;
