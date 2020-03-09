@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
 const app = express();
 const bookRouter = express.Router();
@@ -8,20 +9,30 @@ const db = mongoose.connect('mongodb://localhost/bookAPI');
 
 const Book = require('./models/bookModel');
 
-bookRouter.route('/books').get((req, res) => {
-	const query = {};
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-	if (req.query.genre) {
-		query.genre = req.query.genre;
-	}
+bookRouter
+	.route('/books')
+	.post((req, res) => {
+		const book = new Book(req.body);
+		book.save();
+		return res.status(201).json(book);
+	})
+	.get((req, res) => {
+		const query = {};
 
-	Book.find(query, (err, books) => {
-		if (err) {
-			return res.send(err);
+		if (req.query.genre) {
+			query.genre = req.query.genre;
 		}
-		return res.send(books);
+
+		Book.find(query, (err, books) => {
+			if (err) {
+				return res.send(err);
+			}
+			return res.send(books);
+		});
 	});
-});
 bookRouter.route('/books/:bookId').get((req, res) => {
 	Book.findById(req.params.bookId, (err, books) => {
 		if (err) {
