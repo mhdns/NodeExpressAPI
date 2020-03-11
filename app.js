@@ -4,7 +4,13 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const port = process.env.PORT || 3000;
-mongoose.connect('mongodb://localhost/bookAPI');
+
+if (process.env.ENV === 'Test') {
+	mongoose.connect('mongodb://localhost/bookAPI_test');
+} else {
+	mongoose.connect('mongodb://localhost/bookAPI');
+}
+
 const Book = require('./models/bookModel');
 const bookRouter = require('./routes/bookRouter')(Book);
 
@@ -15,7 +21,9 @@ app.get('/', (req, res) => {
 	res.send('Welcome to my API!');
 });
 
-app.listen(port, () => {
+app.server = app.listen(port, () => {
 	// eslint-disable-next-line no-console
 	console.log(`Running on port ${port}...`);
 });
+
+module.exports = app;
